@@ -269,5 +269,50 @@ grep -E ":(${PANEL_PORT}|${SUBSCRIPTION_PORT})\\b" || true
 echo
 echo "请妥善保存凭据，不要截图公开密码。"
 echo "============================================================"
+echo
+echo "============================================================"
+echo " 开始 Reality 候选域名测速"
+echo "============================================================"
+
+readonly DOMAIN_TEST_URL="https://raw.githubusercontent.com/bangkerwoo/vps-tools/main/test-reality-domains.sh"
+readonly DOMAIN_TEST_SCRIPT="/root/test-reality-domains.sh"
+readonly DOMAIN_TEST_LOG="/root/reality-domain-test.log"
+
+if curl \
+--fail \
+--location \
+--proto '=https' \
+--tlsv1.2 \
+--retry 3 \
+--connect-timeout 10 \
+--max-time 60 \
+--silent \
+--show-error \
+"${DOMAIN_TEST_URL}" \
+--output "${DOMAIN_TEST_SCRIPT}"
+then
+chmod 700 "${DOMAIN_TEST_SCRIPT}"
+
+if bash -n "${DOMAIN_TEST_SCRIPT}"; then
+log "测速脚本语法检查通过，开始测速……"
+
+if bash "${DOMAIN_TEST_SCRIPT}" | tee "${DOMAIN_TEST_LOG}"; then
+chmod 600 "${DOMAIN_TEST_LOG}"
+success "Reality 域名测速完成。"
+log "测速结果已保存到：${DOMAIN_TEST_LOG}"
+else
+log "域名测速未正常完成，但不影响 S-UI 安装结果。"
+fi
+else
+log "测速脚本语法检查失败，已经跳过测速。"
+fi
+else
+log "测速脚本下载失败，已经跳过测速。"
+fi
+
+echo
+echo "以后可重新测速："
+echo "bash ${DOMAIN_TEST_SCRIPT}"
+echo
 
 success "全部流程已完成。"
