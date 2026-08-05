@@ -66,19 +66,32 @@ fi
 
 random_alnum() {
 local length="$1"
+local value=""
 
-openssl rand -base64 64 |
-tr -dc 'A-Za-z0-9' |
-head -c "${length}"
+while [[ "${#value}" -lt "${length}" ]]; do
+value+="$(
+openssl rand -hex 32 |
+tr -dc 'A-Za-z0-9' || true
+)"
+done
+
+printf '%s' "${value:0:length}"
 }
 
 random_lower() {
 local length="$1"
+local value=""
 
-openssl rand -base64 64 |
-tr -dc 'a-z0-9' |
-head -c "${length}"
+while [[ "${#value}" -lt "${length}" ]]; do
+value+="$(
+openssl rand -hex 32 |
+tr -dc 'a-z0-9' || true
+)"
+done
+
+printf '%s' "${value:0:length}"
 }
+
 
 port_in_use() {
 local port="$1"
